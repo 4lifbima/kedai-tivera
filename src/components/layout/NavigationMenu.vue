@@ -96,11 +96,11 @@ function submitSearch() {
     @close="handleClosed"
     @click="handleBackdropClick"
   >
-    <div class="max-h-[92dvh] overflow-y-auto px-5 pb-7 pt-4 sm:max-h-[85dvh] sm:px-6">
+    <div class="max-h-[92dvh] overflow-y-auto px-5 pb-7 sm:max-h-[85dvh] sm:px-6">
       <h2 id="app-menu-title" class="sr-only">Menu navigasi</h2>
 
       <div
-        class="sticky top-0 z-10 -mx-5 -mt-4 flex items-center justify-between bg-surface px-5 pb-1 pt-4 sm:-mx-6 sm:px-6"
+        class="sticky top-0 z-10 -mx-5 flex items-center justify-between bg-surface px-5 pb-1 pt-4 sm:-mx-6 sm:px-6"
       >
         <span
           class="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary"

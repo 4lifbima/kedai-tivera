@@ -19,23 +19,23 @@ const menuGroups = [
     id: 'jelajahi',
     label: 'Jelajahi',
     items: [
-      { label: 'Semua Menu', icon: 'grid', category: 'Semua' },
-      { label: 'Makanan', icon: 'chefHat', category: 'Makanan' },
-      { label: 'Snack', icon: 'donut', category: 'Snack' },
-      { label: 'Minuman', icon: 'cupHot', category: 'Minuman' },
-      { label: 'Paket', icon: 'gift', category: 'Paket' },
-      { label: 'Favorit', icon: 'heartLinear', to: { name: 'favorites' } },
+      { label: 'Semua Menu', icon: 'gridBoldduotone', category: 'Semua' },
+      { label: 'Makanan', icon: 'chefHatBoldduotone', category: 'Makanan' },
+      { label: 'Snack', icon: 'donutBoldduotone', category: 'Snack' },
+      { label: 'Minuman', icon: 'cupHotBoldduotone', category: 'Minuman' },
+      { label: 'Paket', icon: 'giftBoldduotone', category: 'Paket' },
+      { label: 'Favorit', icon: 'heartBoldduotone', to: { name: 'favorites' } },
     ],
   },
   {
     id: 'akun',
     label: 'Akun & Bantuan',
     items: [
-      { label: 'Keranjang', icon: 'cartLinear', to: { name: 'cart' } },
-      { label: 'Profil', icon: 'userLinear', to: { name: 'profile' } },
+      { label: 'Keranjang', icon: 'cartBoldduotone', to: { name: 'cart' } },
+      { label: 'Profil', icon: 'userBoldduotone', to: { name: 'profile' } },
       {
         label: 'WhatsApp',
-        icon: 'chat',
+        icon: 'chatBoldduotone',
         href: 'https://wa.me/6281234567890',
       },
     ],
@@ -109,7 +109,7 @@ function submitSearch() {
         </span>
         <BaseIconButton
           ref="closeButton"
-          name="close"
+          name="closeBoldduotone"
           label="Tutup menu"
           variant="ghost"
           size="sm"
@@ -138,7 +138,7 @@ function submitSearch() {
             aria-label="Cari menu"
             class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-secondary transition-colors hover:bg-surface-secondary hover:text-primary"
           >
-            <AppIcon name="search" :size="19" />
+            <AppIcon name="searchBoldduotone" :size="20" />
           </button>
         </div>
       </form>
@@ -165,7 +165,7 @@ function submitSearch() {
               <span
                 class="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary transition-colors duration-150 group-hover:bg-surface"
               >
-                <AppIcon :name="item.icon" :size="22" />
+                <AppIcon :name="item.icon" :size="24" />
               </span>
               <span class="mt-2 text-[11px] font-semibold text-text-primary sm:text-xs">
                 {{ item.label }}
@@ -183,7 +183,7 @@ function submitSearch() {
               <span
                 class="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary transition-colors duration-150 group-hover:bg-surface"
               >
-                <AppIcon :name="item.icon" :size="22" />
+                <AppIcon :name="item.icon" :size="24" />
               </span>
               <span class="mt-2 text-[11px] font-semibold text-text-primary sm:text-xs">
                 {{ item.label }}
@@ -199,7 +199,7 @@ function submitSearch() {
               <span
                 class="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary transition-colors duration-150 group-hover:bg-surface"
               >
-                <AppIcon :name="item.icon" :size="22" />
+                <AppIcon :name="item.icon" :size="24" />
               </span>
               <span class="mt-2 text-[11px] font-semibold text-text-primary sm:text-xs">
                 {{ item.label }}

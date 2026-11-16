@@ -87,14 +87,14 @@ const cartLabel = computed(() =>
 
         <button
           type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-full text-text-primary transition-colors duration-150 hover:bg-surface-secondary"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors duration-150 bg-red-700"
           aria-label="Buka menu navigasi"
           aria-haspopup="dialog"
           :aria-controls="menuOpen ? 'app-menu' : undefined"
           :aria-expanded="menuOpen"
           @click="menuOpen = true"
         >
-          <AppIcon name="menu" :size="22" />
+          <AppIcon name="menu" :size="20" />
         </button>
       </div>
     </div>

@@ -4,55 +4,45 @@ import { RouterLink } from 'vue-router'
 import AppIcon from '@/components/ui/AppIcon.vue'
 
 const AUTOPLAY_DELAY = 6000
+const SWIPE_THRESHOLD = 40
 
 const slides = [
   {
     id: 'nasi-goreng',
-    eyebrow: 'Menu Andalan',
-    title: 'Nasi goreng spesial',
-    description:
-      'Telur mata sapi, ayam goreng, dan bumbu rumahan yang gurih.',
-    image: '/images/products/nasi-goreng.webp',
-    alt: 'Nasi goreng spesial dengan telur dan ayam goreng',
+    desktopImage: '/images/banners/banner-nasi-goreng.webp',
+    mobileImage: '/images/banners/banner-nasi-goreng-mobile.webp',
+    alt: 'Promo Menu Andalan Kedai Tivera: Nasi Goreng Spesial',
     to: { name: 'product-detail', params: { slug: 'nasi-goreng-spesial' } },
-    cta: 'Lihat Menu',
   },
   {
     id: 'paket-berdua',
-    eyebrow: 'Hemat Berdua',
-    title: 'Hemat paket berdua',
-    description: 'Aneka lauk, nasi, dan sayur untuk dua orang.',
-    image: '/images/products/paket-berdua.webp',
-    alt: 'Paket berdua berisi aneka lauk, nasi, dan sayur',
+    desktopImage: '/images/banners/banner-paket-berdua.webp',
+    mobileImage: '/images/banners/banner-paket-berdua-mobile.webp',
+    alt: 'Promo Hemat Berdua Kedai Tivera: Paket Hemat Berdua',
     to: { name: 'product-detail', params: { slug: 'paket-berdua' } },
-    cta: 'Pesan Paket',
   },
   {
     id: 'es-kopi-susu',
-    eyebrow: 'Teman Santai',
-    title: 'Es kopi susu creamy',
-    description: 'Espresso, susu, dan es batu untuk jeda di tengah hari.',
-    image: '/images/products/kopi-susu.webp',
-    alt: 'Es kopi susu dalam gelas dengan es batu',
+    desktopImage: '/images/banners/banner-kopi-susu.webp',
+    mobileImage: '/images/banners/banner-kopi-susu-mobile.webp',
+    alt: 'Promo Teman Santai Kedai Tivera: Es Kopi Susu Creamy',
     to: { name: 'product-detail', params: { slug: 'es-kopi-susu' } },
-    cta: 'Lihat Minuman',
   },
 ]
 
 const activeIndex = ref(0)
+const transitionName = ref('banner-slide-next')
 const userPaused = ref(false)
 const interactionPaused = ref(false)
 const reduceMotion = ref(false)
 
 let autoplayTimer = null
+let touchStartX = 0
+let touchStartY = 0
+let motionQuery = null
 
 const activeSlide = computed(() => slides[activeIndex.value])
 const isPaused = computed(() => userPaused.value)
-
-const activeSrcset = computed(
-  () =>
-    `${activeSlide.value.image.replace('.webp', '-sm.webp')} 420w, ${activeSlide.value.image} 900w`,
-)
 
 function stopAutoplay() {
   if (autoplayTimer) {
@@ -73,13 +63,27 @@ function startAutoplay() {
   if (!shouldPlay) return
 
   autoplayTimer = setInterval(() => {
+    transitionName.value = 'banner-slide-next'
     activeIndex.value = (activeIndex.value + 1) % slides.length
   }, AUTOPLAY_DELAY)
 }
 
-function showSlide(index) {
-  activeIndex.value = (index + slides.length) % slides.length
+function showSlide(index, direction) {
+  const target = (index + slides.length) % slides.length
+  if (target === activeIndex.value) return
+
+  transitionName.value =
+    direction ?? (target > activeIndex.value ? 'banner-slide-next' : 'banner-slide-prev')
+  activeIndex.value = target
   startAutoplay()
+}
+
+function nextSlide() {
+  showSlide(activeIndex.value + 1, 'banner-slide-next')
+}
+
+function prevSlide() {
+  showSlide(activeIndex.value - 1, 'banner-slide-prev')
 }
 
 function toggleAutoplay() {
@@ -103,16 +107,62 @@ function handleFocusOut(event) {
   }
 }
 
+function handleTouchStart(event) {
+  const touch = event.touches[0]
+  if (!touch) return
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  pauseForInteraction()
+}
+
+function handleTouchEnd(event) {
+  const touch = event.changedTouches[0]
+  if (touch) {
+    const dx = touch.clientX - touchStartX
+    const dy = touch.clientY - touchStartY
+    if (Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) nextSlide()
+      else prevSlide()
+    }
+  }
+  resumeAfterInteraction()
+}
+
+function handleKeydown(event) {
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    nextSlide()
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    prevSlide()
+  }
+}
+
+function handleMotionChange(event) {
+  reduceMotion.value = event.matches
+  startAutoplay()
+}
+
+function preloadSlides() {
+  const isDesktop = window.matchMedia('(min-width: 640px)').matches
+  for (const slide of slides.slice(1)) {
+    const img = new Image()
+    img.src = isDesktop ? slide.desktopImage : slide.mobileImage
+  }
+}
+
 onMounted(() => {
-  reduceMotion.value = window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  ).matches
+  motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  reduceMotion.value = motionQuery.matches
+  motionQuery.addEventListener('change', handleMotionChange)
+  preloadSlides()
   startAutoplay()
   document.addEventListener('visibilitychange', startAutoplay)
 })
 
 onBeforeUnmount(() => {
   stopAutoplay()
+  motionQuery?.removeEventListener('change', handleMotionChange)
   document.removeEventListener('visibilitychange', startAutoplay)
 })
 </script>
@@ -126,54 +176,50 @@ onBeforeUnmount(() => {
     @mouseleave="resumeAfterInteraction"
     @focusin="pauseForInteraction"
     @focusout="handleFocusOut"
+    @keydown="handleKeydown"
   >
-    <div class="overflow-hidden rounded-3xl bg-primary text-white">
-      <div class="grid">
-        <Transition name="banner-slide">
-          <article
+    <div
+      class="overflow-hidden rounded-xl bg-primary-dark shadow-card"
+      @touchstart.passive="handleTouchStart"
+      @touchend.passive="handleTouchEnd"
+      @touchcancel.passive="resumeAfterInteraction"
+    >
+      <div class="grid overflow-hidden">
+        <Transition :name="transitionName">
+          <div
             :key="activeSlide.id"
-            class="col-start-1 row-start-1 flex min-h-[140px] items-center gap-3 p-4 sm:min-h-[200px] sm:gap-6 sm:p-6 lg:min-h-[236px] lg:p-8"
+            class="col-start-1 row-start-1 w-full"
             role="group"
             aria-roledescription="slide"
             :aria-label="`${activeIndex + 1} dari ${slides.length}`"
           >
-            <div class="min-w-0 flex-1">
-              <p
-                class="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75"
-              >
-                {{ activeSlide.eyebrow }}
-              </p>
-              <h2
-                class="mt-1.5 line-clamp-2 text-base font-bold leading-snug text-white sm:text-xl lg:text-2xl"
-              >
-                {{ activeSlide.title }}
-              </h2>
-              <p
-                class="mt-1 hidden max-w-sm text-sm leading-relaxed text-white/80 sm:block"
-              >
-                {{ activeSlide.description }}
-              </p>
-              <RouterLink
-                :to="activeSlide.to"
-                class="mt-3 inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-4 text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary-light sm:mt-4 sm:h-10"
-              >
-                {{ activeSlide.cta }}
-                <AppIcon name="arrowRight" :size="16" />
-              </RouterLink>
-            </div>
-
-            <img
-              :src="activeSlide.image"
-              :srcset="activeSrcset"
-              sizes="(min-width: 1024px) 160px, (min-width: 640px) 128px, 80px"
-              width="900"
-              height="900"
-              :alt="activeSlide.alt"
-              loading="eager"
-              decoding="async"
-              class="h-20 w-20 shrink-0 rounded-2xl object-cover sm:h-32 sm:w-32 lg:h-40 lg:w-40"
-            />
-          </article>
+            <RouterLink
+              :to="activeSlide.to"
+              :aria-label="activeSlide.alt"
+              class="block aspect-video w-full rounded-xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white sm:aspect-[16/5]"
+            >
+              <picture class="block h-full w-full">
+                <source
+                  media="(min-width: 640px)"
+                  :srcset="activeSlide.desktopImage"
+                  type="image/webp"
+                  width="1920"
+                  height="600"
+                />
+                <img
+                  :src="activeSlide.mobileImage"
+                  :alt="activeSlide.alt"
+                  width="1024"
+                  height="576"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  draggable="false"
+                  class="block h-full w-full select-none object-cover"
+                />
+              </picture>
+            </RouterLink>
+          </div>
         </Transition>
       </div>
     </div>
@@ -185,7 +231,7 @@ onBeforeUnmount(() => {
           :key="slide.id"
           type="button"
           class="flex h-6 w-6 items-center justify-center rounded-full"
-          :aria-label="`Tampilkan banner ${index + 1}: ${slide.title}`"
+          :aria-label="`Tampilkan banner ${index + 1}: ${slide.alt}`"
           :aria-current="index === activeIndex ? 'true' : undefined"
           @click="showSlide(index)"
         >
@@ -201,15 +247,16 @@ onBeforeUnmount(() => {
       </div>
 
       <button
+        v-if="!reduceMotion"
         type="button"
-        class="inline-flex h-7 items-center gap-1.5 rounded-full px-2 text-[11px] font-semibold text-text-secondary transition-colors duration-150 hover:text-text-primary"
+        class="inline-flex h-7 w-7 items-center justify-center rounded-full text-text-secondary transition-colors duration-150 hover:bg-surface-secondary hover:text-text-primary"
         :aria-label="
           isPaused ? 'Putar otomatis banner' : 'Jeda otomatis banner'
         "
+        :aria-pressed="isPaused"
         @click="toggleAutoplay"
       >
         <AppIcon :name="isPaused ? 'play' : 'pause'" :size="13" />
-        {{ isPaused ? 'Putar' : 'Jeda' }}
       </button>
     </div>
   </section>

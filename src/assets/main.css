@@ -192,21 +192,28 @@ dialog:not(.menu-sheet) {
   }
 }
 
-.banner-slide-enter-active,
-.banner-slide-leave-active {
-  transition:
-    opacity 220ms ease-in-out,
-    transform 220ms ease-in-out;
+.banner-slide-next-enter-active,
+.banner-slide-next-leave-active,
+.banner-slide-prev-enter-active,
+.banner-slide-prev-leave-active {
+  transition: transform 250ms ease-in-out;
+  will-change: transform;
 }
 
-.banner-slide-enter-from {
-  opacity: 0;
-  transform: translateX(14px);
+.banner-slide-next-enter-from {
+  transform: translateX(100%);
 }
 
-.banner-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-14px);
+.banner-slide-next-leave-to {
+  transform: translateX(-100%);
+}
+
+.banner-slide-prev-enter-from {
+  transform: translateX(-100%);
+}
+
+.banner-slide-prev-leave-to {
+  transform: translateX(100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

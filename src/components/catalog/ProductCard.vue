@@ -33,7 +33,7 @@ const detailRoute = computed(() => ({
   <article class="group relative h-full">
     <RouterLink
       :to="detailRoute"
-      class="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-shadow duration-200 hover:shadow-card"
+      class="flex h-full flex-col overflow-hidden rounded-[8px] border border-border bg-surface transition-shadow duration-200 hover:shadow-card"
     >
       <div class="relative aspect-square overflow-hidden bg-surface-secondary">
         <ProductImage

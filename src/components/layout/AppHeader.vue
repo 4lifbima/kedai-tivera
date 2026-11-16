@@ -87,7 +87,7 @@ const cartLabel = computed(() =>
 
         <button
           type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors duration-150 bg-red-700"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors duration-150 bg-red-700 lg:hidden"
           aria-label="Buka menu navigasi"
           aria-haspopup="dialog"
           :aria-controls="menuOpen ? 'app-menu' : undefined"
